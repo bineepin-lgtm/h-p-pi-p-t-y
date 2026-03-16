@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday - Chúc Mừng Sinh Nhật</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 100%);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .cursive { font-family: 'Dancing Script', cursive; }
+
+        /* Bong bóng */
+        .balloon {
+            position: absolute;
+            bottom: -100px;
+            width: 50px;
+            height: 70px;
+            border-radius: 50%;
+            animation: float 15s infinite ease-in;
+            opacity: 0.6;
+            z-index: 5;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); left: var(--left); }
+            100% { transform: translateY(-120vh) rotate(20deg); left: var(--left); }
+        }
+
+        /* Hiệu ứng pháo hoa & chữ */
+        .firework-particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        .floating-wish {
+            position: absolute;
+            font-weight: bold;
+            pointer-events: none;
+            z-index: 60;
+            animation: wish-up 2s ease-out forwards;
+            white-space: nowrap;
+        }
+
+        @keyframes wish-up {
+            0% { transform: translateY(0) scale(0.5); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(-100px) scale(1.2); opacity: 0; }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 30px;
+        }
+
+        /* Hộp quà rung rinh */
+        .gift-box {
+            font-size: 80px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .gift-box:hover {
+            transform: scale(1.2) rotate(10deg);
+        }
+
+        .shake {
+            animation: shake 0.5s infinite;
+        }
+
+        @keyframes shake {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(5deg); }
+            50% { transform: rotate(0eg); }
+            75% { transform: rotate(-5deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        /* Video Overlay */
+        #video-overlay {
+            position: fixed;
+            inset: 0;
+            background: black;
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <div id="balloon-container"></div>
+
+    <!-- Màn hình chính -->
+    <section id="main-screen" class="min-h-screen flex items-center justify-center p-4">
+        <div class="max-w-md w-full glass-card p-8 shadow-2xl text-center relative z-20">
+            <div class="mb-6">
+                <div class="w-32 h-32 mx-auto bg-pink-200 rounded-full border-4 border-white shadow-lg flex items-center justify-center text-6xl">
+                    🎂
+                </div>
+            </div>
+
+            <h1 class="text-4xl font-bold text-pink-600 mb-2 cursive">Happy Birthday!</h1>
+            <h2 class="text-2xl font-bold text-purple-700 mb-6">Bòa Bảo "Slay"</h2>
+
+            <!-- Khu vực Hộp Quà -->
+            <div class="mb-8">
+                <p class="text-sm text-gray-500 mb-2 font-bold uppercase">Có một món quà bí mật nè!</p>
+                <div class="gift-box shake" onclick="openGift()">🎁</div>
+            </div>
+
+            <button onclick="createFireworksWithWishes()" class="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-transform active:scale-95">
+                Bắn Pháo Hoa & Lời Chúc ✨
+            </button>
+        </div>
+    </section>
+
+    <!-- Video Overlay -->
+    <div id="video-overlay">
+        <div class="w-full max-w-2xl px-4">
+            <h3 class="text-white text-center mb-4 text-xl cursive">Kỷ niệm của tụi mình...</h3>
+            <!-- Link video: Thay 'your_video_id' bằng ID youtube hoặc link mp4 -->
+            <div class="aspect-video bg-gray-800 rounded-xl overflow-hidden">
+                <iframe id="birthday-video" class="w-full h-full" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            </div>
+            <button onclick="skipVideo()" class="mt-6 text-white bg-white/20 px-6 py-2 rounded-lg mx-auto block hover:bg-white/30">Bỏ qua video</button>
+        </div>
+    </div>
+
+    <!-- Trang lời chúc chi tiết -->
+    <section id="detail-wishes" class="min-h-screen flex items-center justify-center p-4">
+        <div class="max-w-2xl w-full glass-card p-10 shadow-2xl relative z-20">
+            <h2 class="text-3xl font-bold text-pink-600 mb-8 cursive text-center">Gửi bòa Bảo thân yêu...</h2>
+            
+            <div class="space-y-6 text-gray-700 text-lg leading-relaxed">
+                <p class="first-letter:text-5xl first-letter:font-bold first-letter:text-pink-500 first-letter:mr-3 first-letter:float-left">
+                    Chúc mừng bòa đã chính thức bước sang tuổi mới! Mong rằng tuổi 15 của bòa sẽ thật rực rỡ và <span class="text-pink-500 font-bold">slay</span> như cách bòa vẫn luôn thể hiện.
+                </p>
+                <p>
+                    Dù cuộc sống đôi khi có hơi "chùy ài vò tơ sư quang", mong bòa luôn giữ vững tinh thần "cọng tươi", lúc nào cũng năng lượng và <span class="text-purple-500 font-bold">dịu kha</span> với mọi người xung quanh.
+                </p>
+                <p>
+                    Hy vọng mỗi ngày của bòa đều ngập tràn <span class="text-blue-500 font-bold">mộc tươi</span>, không bao giờ phải gặp cảnh "nồm xẹt" và luôn có những "bestie" chất lượng bên cạnh để cùng "chill".
+                </p>
+                <p class="text-right font-bold text-pink-600 cursive text-2xl">
+                    - Từ một người bạn cực mến bòa -
+                </p>
+            </div>
+
+            <div class="mt-10 text-center">
+                <button onclick="window.scrollTo(0,0)" class="text-pink-400 hover:text-pink-600 transition-colors">↑ Quay lại đầu trang</button>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Tạo bong bóng bay
+        function createBalloons() {
+            const container = document.getElementById('balloon-container');
+            const colors = ['#ff4081', '#7c4dff', '#40c4ff', '#ffeb3b', '#ff5252'];
+            for(let i = 0; i < 20; i++) {
+                const balloon = document.createElement('div');
+                balloon.className = 'balloon';
+                balloon.style.setProperty('--left', Math.random() * 100 + 'vw');
+                balloon.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                balloon.style.animationDelay = (Math.random() * 10) + 's';
+                container.appendChild(balloon);
+            }
+        }
+
+        // Mở hộp quà
+        function openGift() {
+            const overlay = document.getElementById('video-overlay');
+            const video = document.getElementById('birthday-video');
+            
+            // Link video mẫu (YouTube Embed - bòa có thể thay link khác vào đây)
+            // Thêm ?autoplay=1 để tự động phát nếu trình duyệt cho phép
+            video.src = "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"; 
+            
+            overlay.style.display = 'flex';
+        }
+
+        function skipVideo() {
+            const overlay = document.getElementById('video-overlay');
+            const video = document.getElementById('birthday-video');
+            video.src = ""; // Stop video
+            overlay.style.display = 'none';
+            
+            // Cuộn đến phần lời chúc chi tiết
+            document.getElementById('detail-wishes').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Pháo hoa kèm lời chúc bay lên
+        function createFireworksWithWishes() {
+            const wishes = ["Slay quá bòa ơi!", "Dịu kha xỉu", "Cọng tươi nè", "Tuổi mới lỳ lợm", "Mộc tươi mỗi ngày", "Chill đi bòa"];
+            const colors = ['#FFD700', '#FF69B4', '#00FFFF', '#ADFF2F', '#FF4500'];
+            
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    const x = Math.random() * window.innerWidth;
+                    const y = Math.random() * (window.innerHeight / 1.5);
+                    
+                    // Tạo chữ bay lên
+                    const wishText = document.createElement('div');
+                    wishText.className = 'floating-wish text-pink-600';
+                    wishText.style.left = x + 'px';
+                    wishText.style.top = y + 'px';
+                    wishText.innerText = wishes[Math.floor(Math.random() * wishes.length)];
+                    document.body.appendChild(wishText);
+                    setTimeout(() => wishText.remove(), 2000);
+
+                    // Tạo pháo hoa
+                    for (let j = 0; j < 25; j++) {
+                        const p = document.createElement('div');
+                        p.className = 'firework-particle';
+                        p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                        p.style.left = x + 'px';
+                        p.style.top = y + 'px';
+                        
+                        const angle = Math.random() * Math.PI * 2;
+                        const velocity = Math.random() * 120 + 60;
+                        const vx = Math.cos(angle) * velocity;
+                        const vy = Math.sin(angle) * velocity;
+                        
+                        document.body.appendChild(p);
+                        
+                        const anim = p.animate([
+                            { transform: 'translate(0, 0)', opacity: 1 },
+                            { transform: `translate(${vx}px, ${vy}px)`, opacity: 0 }
+                        ], { duration: 1000, easing: 'ease-out' });
+                        
+                        anim.onfinish = () => p.remove();
+                    }
+                }, i * 400);
+            }
+        }
+
+        window.onload = createBalloons;
+    </script>
+</body>
+</html>
